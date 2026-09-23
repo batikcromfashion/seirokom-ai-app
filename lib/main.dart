@@ -32,7 +32,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<Map<String, String>> _messages = [];
   bool _isLoading = false;
 
-  final String apiUrl = "https://seirokom-ai-backend.onrender.com/api/chat";
+  // Google AI Studio থেকে পাওয়া আপনার API Key
+  final String apiKey = "AQ.Ab8RN6KcMg_f7dBdYhC6qcPNJ9jSG5_7IATOAlVqR1aJ6PBiag";
 
   Future<void> _sendMessage(String text) async {
     if (text.trim().isEmpty) return;
@@ -44,16 +45,27 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _controller.clear();
 
+    final url = Uri.parse(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey");
+
     try {
       final response = await http.post(
-        Uri.parse(apiUrl),
+        url,
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"message": text}),
+        body: jsonEncode({
+          "contents": [
+            {
+              "parts": [
+                {"text": text}
+              ]
+            }
+          ]
+        }),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final aiReply = data['response'] ?? data['message'] ?? "কোনো উত্তর পাওয়া যায়নি।";
+        final aiReply = data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? "কোনো উত্তর পাওয়া যায়নি।";
 
         setState(() {
           _messages.add({"sender": "ai", "text": aiReply});
@@ -105,7 +117,11 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           ),
-          if (_isLoading) const CircularProgressIndicator(),
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: CircularProgressIndicator(),
+            ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
