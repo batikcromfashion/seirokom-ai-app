@@ -32,7 +32,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<Map<String, String>> _messages = [];
   bool _isLoading = false;
 
-  // Google AI Studio থেকে পাওয়া আপনার API Key (নতুন AQ. ফরম্যাট)
+  // Google AI Studio থেকে পাওয়া আপনার API Key
   final String apiKey = "AQ.Ab8RN6Iysp4nj1H9pZtVFw-cQ8z7QpQbx9T-W8J_qv2RHZQfJw";
 
   Future<void> _sendMessage(String text) async {
@@ -45,28 +45,30 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _controller.clear();
 
-    // OpenAI-compatible endpoint ব্যবহার করা হচ্ছে
+    // Gemini Native REST API endpoint (URL এর সাথে key পাস করা হয়েছে)
     final url = Uri.parse(
-        "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions");
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey");
 
     try {
       final response = await http.post(
         url,
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer $apiKey",
         },
         body: jsonEncode({
-          "model": "gemini-2.5-flash",
-          "messages": [
-            {"role": "user", "content": text}
+          "contents": [
+            {
+              "parts": [
+                {"text": text}
+              ]
+            }
           ]
         }),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final aiReply = data['choices']?[0]?['message']?['content'] ?? "কোনো উত্তর পাওয়া যায়নি।";
+        final aiReply = data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? "কোনো উত্তর পাওয়া যায়নি।";
 
         setState(() {
           _messages.add({"sender": "ai", "text": aiReply});
