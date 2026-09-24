@@ -45,30 +45,28 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _controller.clear();
 
+    // OpenAI-compatible endpoint ব্যবহার করা হচ্ছে
     final url = Uri.parse(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent");
+        "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions");
 
     try {
       final response = await http.post(
         url,
         headers: {
           "Content-Type": "application/json",
-          "x-goog-api-key": apiKey,
+          "Authorization": "Bearer $apiKey",
         },
         body: jsonEncode({
-          "contents": [
-            {
-              "parts": [
-                {"text": text}
-              ]
-            }
+          "model": "gemini-2.5-flash",
+          "messages": [
+            {"role": "user", "content": text}
           ]
         }),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final aiReply = data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? "কোনো উত্তর পাওয়া যায়নি।";
+        final aiReply = data['choices']?[0]?['message']?['content'] ?? "কোনো উত্তর পাওয়া যায়নি।";
 
         setState(() {
           _messages.add({"sender": "ai", "text": aiReply});
