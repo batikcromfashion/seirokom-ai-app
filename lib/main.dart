@@ -32,8 +32,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<Map<String, String>> _messages = [];
   bool _isLoading = false;
 
-  // Google AI Studio থেকে পাওয়া আপনার API Key
-  final String apiKey = "AQ.Ab8RN6KcMg_f7dBdYhC6qcPNJ9jSG5_7IATOAlVqR1aJ6PBiag";
+  // Google AI Studio থেকে পাওয়া আপনার API Key (নতুন AQ. ফরম্যাট)
+  final String apiKey = "AQ.Ab8RN6Iysp4nj1H9pZtVFw-cQ8z7QpQbx9T-W8J_qv2RHZQfJw";
 
   Future<void> _sendMessage(String text) async {
     if (text.trim().isEmpty) return;
@@ -46,12 +46,15 @@ class _ChatScreenState extends State<ChatScreen> {
     _controller.clear();
 
     final url = Uri.parse(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey");
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent");
 
     try {
       final response = await http.post(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
         body: jsonEncode({
           "contents": [
             {
@@ -65,14 +68,14 @@ class _ChatScreenState extends State<ChatScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final aiReply = data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? "কোনো উত্তর পাওয়া যায়নি।";
+        final aiReply = data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? "কোনো উত্তর পাওয়া যায়নি।";
 
         setState(() {
           _messages.add({"sender": "ai", "text": aiReply});
         });
       } else {
         setState(() {
-          _messages.add({"sender": "ai", "text": "Error: ${response.statusCode}"});
+          _messages.add({"sender": "ai", "text": "Error: ${response.statusCode} - ${response.body}"});
         });
       }
     } catch (e) {
