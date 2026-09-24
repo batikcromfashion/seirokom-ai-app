@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'tryon_screen.dart';
+import 'chatbot_screen.dart';
 
 void main() {
   runApp(const SeiRokomApp());
@@ -36,6 +37,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const TryOnScreen(),
+    const ChatbotScreen(),
   ];
 
   @override
@@ -61,6 +63,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             icon: Icon(Icons.auto_awesome_outlined),
             activeIcon: Icon(Icons.auto_awesome),
             label: 'AI ট্রাই-অন',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline),
+            activeIcon: Icon(Icons.chat_bubble),
+            label: 'AI চ্যাট',
           ),
         ],
       ),
