@@ -20,8 +20,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   bool _isLoading = false;
 
-  // Google AI Studio API Key
-  static const String _apiKey = 'AQ.Ab8RN6K3cJHwRncjG-YFyHfn-699zBPGuRxwVCAUQN0p58-3KA';
+  // এখানে কেবল আসল 'AIzaSy' দিয়ে শুরু হওয়া Gemini API Key টি দিন
+  static const String _apiKey = 'AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 
   Future<void> _sendMessage() async {
     if (_controller.text.trim().isEmpty) return;
