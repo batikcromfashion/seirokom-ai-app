@@ -12,9 +12,28 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   final List<Map<String, String>> _messages = [
     {
       'sender': 'ai',
-      'text': 'হ্যালো! SeiRokom Fashion-এ স্বাগতম। সাইজ বা সাইজিং বিষয়ে জানতে প্রশ্ন করুন।'
+      'text': 'হ্যালো! SeiRokom Fashion-এ স্বাগতম। সাইজ, দাম বা প্রোডাক্ট বিষয়ে কোনো প্রশ্ন থাকলে বলুন!'
     }
   ];
+
+  // ইউজার কী লিখছে তার ওপর ভিত্তি করে বুদ্ধিমান উত্তর তৈরি করার ফাংশন
+  String _getAIResponse(String query) {
+    String lowerQuery = query.toLowerCase();
+
+    if (lowerQuery.contains('সাইজ') || lowerQuery.contains('size') || lowerQuery.contains('মাপ')) {
+      return 'আমাদের প্রিমিয়াম বাটিক শার্ট M, L, XL এবং XXL সাইজে অ্যাভেইলএবল রয়েছে। আপনার বুক ও লম্বা পরিমাপ অনুযায়ী সাইজ নির্বাচন করতে পারেন।';
+    } else if (lowerQuery.contains('দাম') || lowerQuery.contains('price') || lowerQuery.contains('টাকা') || lowerQuery.contains('কত')) {
+      return 'আমাদের প্রিমিয়াম বাটিক শার্টের দাম ৮৫০ টাকা থেকে শুরু। বিস্তারিত জানতে হোমপেজের প্রোডাক্টগুলো দেখুন।';
+    } else if (lowerQuery.contains('ডেলিভারি') || lowerQuery.contains('delivery') || lowerQuery.contains('চার্জ')) {
+      return 'ঢাকার ভেতরে ডেলিভারি চার্জ ৮০ টাকা এবং ঢাকার বাইরে ১৫০ টাকা। সাধারণত ২-৩ দিনের মধ্যে ডেলিভারি করা হয়।';
+    } else if (lowerQuery.contains('কাপড়') || lowerQuery.contains('মেটেরিয়াল') || lowerQuery.contains('fabric') || lowerQuery.contains('সুতি')) {
+      return 'আমাদের সব বাটিক শার্ট ১০০% প্রিমিয়াম কটন (সুতি) কাপড়ে তৈরি, যা অত্যন্ত আরামদায়ক।';
+    } else if (lowerQuery.contains('হাই') || lowerQuery.contains('হ্যালো') || lowerQuery.contains('hello') || lowerQuery.contains('hi')) {
+      return 'হ্যালো! আপনাকে কীভাবে সাহায্য করতে পারি?';
+    } else {
+      return 'ধন্যবাদ আপনার প্রশ্নের জন্য! প্রোডাক্টের সাইজ, দাম বা ডেলিভারি বিষয়ে বিস্তারিত জানতে আমাকে জিজ্ঞেস করতে পারেন।';
+    }
+  }
 
   void _sendMessage() {
     if (_controller.text.trim().isEmpty) return;
@@ -25,12 +44,13 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       _controller.clear();
     });
 
+    // ১ সেকেন্ড পর ডাইনামিক রিপ্লাই দেবে
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
           _messages.add({
             'sender': 'ai',
-            'text': 'আমাদের প্রিমিয়াম বাটিক শার্ট M, L, XL সাইজে অ্যাভেইলেবল রয়েছে।'
+            'text': _getAIResponse(userText)
           });
         });
       }
@@ -78,6 +98,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                       hintText: 'এখানে লিখুন...',
                       border: OutlineInputBorder(),
                     ),
+                    onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
                 IconButton(
