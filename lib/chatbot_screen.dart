@@ -20,8 +20,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   bool _isLoading = false;
 
-  // আপনার Google AI Studio থেকে প্রাপ্ত API Key
-  static const String _apiKey = 'AQ.Ab8RN6IOlsKentc12p5bRSDjSAxLWUhZgyxM-t2T2EtbGEyrSg';
+  // Google AI Studio API Key
+  static const String _apiKey = 'AQ.Ab8RN6K3cJHwRncjG-YFyHfn-699zBPGuRxwVCAUQN0p58-3KA';
 
   Future<void> _sendMessage() async {
     if (_controller.text.trim().isEmpty) return;
@@ -34,7 +34,6 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     });
 
     try {
-      // সরাসরি Gemini REST API এন্ডপয়েন্টে কল করা হচ্ছে
       final url = Uri.parse(
           'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$_apiKey');
 
