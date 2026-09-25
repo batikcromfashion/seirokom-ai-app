@@ -1,5 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:http/http.dart' as http;
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({Key? key}) : super(key: key);
@@ -19,8 +20,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   bool _isLoading = false;
 
-  // আপনার ব্যবহৃত Gemini API Key
-  static const String _apiKey = 'AQ.Ab8RN6I1xzqXu4C5KNqIb_NrAtIao7PgU5yqKgk9cyQasupPdw';
+  // আপনার Google AI Studio থেকে প্রাপ্ত API Key
+  static const String _apiKey = 'AQ.Ab8RN6IOlsKentc12p5bRSDjSAxLWUhZgyxM-t2T2EtbGEyrSg';
 
   Future<void> _sendMessage() async {
     if (_controller.text.trim().isEmpty) return;
@@ -33,20 +34,37 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     });
 
     try {
-      final model = GenerativeModel(
-        model: 'gemini-1.5-flash',
-        apiKey: _apiKey,
-      );
+      // সরাসরি Gemini REST API এন্ডপয়েন্টে কল করা হচ্ছে
+      final url = Uri.parse(
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$_apiKey');
 
       final prompt =
           'You are a helpful AI sales assistant for "SeiRokom Fashion", a clothing brand specializing in Batik Shirts in Bangladesh. Answer in polite Bengali. Question: $userText';
 
-      final response = await model.generateContent([Content.text(prompt)]);
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'contents': [
+            {
+              'parts': [
+                {'text': prompt}
+              ]
+            }
+          ]
+        }),
+      );
 
-      _addAiMessage(response.text ?? 'দুঃখিত, কোনো উত্তর পাওয়া যায়নি।');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final aiText = data['candidates']?[0]['content']?['parts']?[0]['text'];
+        _addAiMessage(aiText ?? 'দুঃখিত, কোনো উত্তর পাওয়া যায়নি।');
+      } else {
+        final errorData = jsonDecode(response.body);
+        _addAiMessage('API Error (${response.statusCode}):\n${errorData['error']?['message'] ?? response.body}');
+      }
     } catch (e) {
-      // সমস্যা নির্দিষ্টভাবে চ্যাট স্ক্রিনে দেখাবে
-      _addAiMessage('এরর ধরা পড়েছে:\n${e.toString()}');
+      _addAiMessage('Connection Error:\n${e.toString()}');
     } finally {
       setState(() {
         _isLoading = false;
