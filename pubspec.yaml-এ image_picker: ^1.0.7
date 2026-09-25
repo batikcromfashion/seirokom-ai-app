@@ -1,0 +1,129 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+class TryOnScreen extends StatefulWidget {
+  const TryOnScreen({Key? key}) : super(key: key);
+
+  @override
+  State<TryOnScreen> createState() => _TryOnScreenState();
+}
+
+class _TryOnScreenState extends State<TryOnScreen> {
+  File? _selectedImage;
+  bool _isProcessing = false;
+  bool _showTryOnResult = false;
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      setState(() {
+        _selectedImage = File(image.path);
+        _showTryOnResult = false;
+      });
+    }
+  }
+
+  void _runAITryOn() {
+    if (_selectedImage == null) return;
+
+    setState(() {
+      _isProcessing = true;
+    });
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _isProcessing = false;
+          _showTryOnResult = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('AI ট্রাই-অন সফলভাবে সম্পন্ন হয়েছে!')),
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('AI Virtual Try-On'),
+        backgroundColor: Colors.amber,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Container(
+              height: 380,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: Colors.amber, width: 2),
+              ),
+              child: _selectedImage == null
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.add_a_photo, size: 60, color: Colors.grey),
+                        SizedBox(height: 10),
+                        Text('আপনার বা মডেলের ছবি নির্বাচন করুন', style: TextStyle(color: Colors.grey)),
+                      ],
+                    )
+                  : Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(13),
+                          child: Image.file(_selectedImage!, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                        ),
+                        if (_showTryOnResult)
+                          Opacity(
+                            opacity: 0.85,
+                            child: Image.network(
+                              'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        if (_isProcessing)
+                          Container(
+                            color: Colors.black45,
+                            child: const Center(
+                              child: CircularProgressIndicator(color: Colors.amber),
+                            ),
+                          ),
+                      ],
+                    ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _pickImage,
+                    icon: const Icon(Icons.photo_library),
+                    label: const Text('ছবি নির্বাচন'),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade800, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 12)),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _selectedImage != null && !_isProcessing ? _runAITryOn : null,
+                    icon: const Icon(Icons.auto_awesome),
+                    label: const Text('ট্রাই-অন করুন'),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 12)),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
