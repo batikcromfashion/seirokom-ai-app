@@ -19,7 +19,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   bool _isLoading = false;
 
-  // তোমার পাঠানো API Key টি এখানে বসিয়ে দেওয়া হয়েছে
+  // আপনার API Key
   static const String _apiKey = 'AQ.Ab8RN6I1xzqXu4C5KNqIb_NrAtIao7PgU5yqKgk9cyQasupPdw';
 
   Future<void> _sendMessage() async {
@@ -33,20 +33,20 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     });
 
     try {
-      if (_apiKey == 'YOUR_GEMINI_API_KEY_HERE' || _apiKey.isEmpty) {
-        await Future.delayed(const Duration(seconds: 1));
-        _addAiMessage(_getFallbackResponse(userText));
-      } else {
-        // সরাসরি Gemini AI মডেল কল করা হচ্ছে
-        final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: _apiKey);
-        final prompt = 'You are a helpful AI sales assistant for "SeiRokom Fashion", a clothing brand specializing in Batik Shirts in Bangladesh. Answer in polite Bengali. Question: $userText';
-        final response = await model.generateContent([Content.text(prompt)]);
+      // Gemini Flash মডেল
+      final model = GenerativeModel(
+        model: 'gemini-1.5-flash', 
+        apiKey: _apiKey,
+      );
+      
+      final prompt = 'You are a helpful AI sales assistant for "SeiRokom Fashion", a clothing brand specializing in Batik Shirts in Bangladesh. Answer in polite Bengali. Question: $userText';
+      
+      final response = await model.generateContent([Content.text(prompt)]);
 
-        _addAiMessage(response.text ?? 'দুঃখিত, পুনরায় চেষ্টা করুন।');
-      }
+      _addAiMessage(response.text ?? 'AI থেকে কোনো টেক্সট আসেনি।');
     } catch (e) {
-      // কোনো কারণে এরর আসলে ডামি উত্তর দেবে
-      _addAiMessage(_getFallbackResponse(userText));
+      // আসল সমস্যা দেখার জন্য সরাসরি এররটি স্ক্রিনে দেখানো হচ্ছে
+      _addAiMessage('এরর ধরা পড়েছে:\n${e.toString()}');
     } finally {
       setState(() {
         _isLoading = false;
@@ -62,21 +62,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     }
   }
 
-  // AI কাজ না করলে বা অফলাইনে থাকলে এই উত্তরগুলো দেবে
-  String _getFallbackResponse(String query) {
-    String q = query.toLowerCase();
-    if (q.contains('সাইজ') || q.contains('size')) {
-      return 'আমাদের প্রিমিয়াম বাটিক শার্ট M, L, XL এবং XXL সাইজে অ্যাভেইলএবল রয়েছে।';
-    } else if (q.contains('দাম') || q.contains('price')) {
-      return 'আমাদের প্রিমিয়াম বাটিক শার্টের দাম ৮৫০ টাকা থেকে শুরু।';
-    } else if (q.contains('ডেলিভারি')) {
-      return 'ঢাকার ভেতরে ডেলিভারি চার্জ ৮০ টাকা এবং ঢাকার বাইরে ১৫০ টাকা।';
-    }
-    return 'SeiRokom Fashion-এ আপনাকে স্বাগতম! আরও তথ্যের জন্য আমাদের সাথে থাকুন।';
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(Widget context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('AI Sales Assistant', style: TextStyle(color: Colors.black)),
@@ -96,19 +83,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                   child: Container(
                     margin: const EdgeInsets.symmetric(vertical: 4),
                     padding: const EdgeInsets.all(12),
-                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
                     decoration: BoxDecoration(
                       color: isUser ? Colors.amber.shade200 : Colors.grey.shade200,
-                      borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(15),
-                        topRight: const Radius.circular(15),
-                        bottomLeft: isUser ? const Radius.circular(15) : const Radius.circular(0),
-                        bottomRight: isUser ? const Radius.circular(0) : const Radius.circular(15),
-                      ),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       _messages[index]['text'] ?? '',
-                      style: const TextStyle(fontSize: 15),
+                      style: const TextStyle(fontSize: 14),
                     ),
                   ),
                 );
@@ -117,32 +99,22 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           ),
           if (_isLoading) const LinearProgressIndicator(color: Colors.amber),
           Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'এখানে লিখুন...',
-                      filled: true,
-                      fillColor: Colors.grey.shade100,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: BorderSide.none,
-                      ),
+                      border: OutlineInputBorder(),
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
-                const SizedBox(width: 8),
-                CircleAvatar(
-                  backgroundColor: Colors.amber,
-                  child: IconButton(
-                    icon: const Icon(Icons.send, color: Colors.black),
-                    onPressed: _sendMessage,
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.send, color: Colors.amber),
+                  onPressed: _sendMessage,
                 ),
               ],
             ),
