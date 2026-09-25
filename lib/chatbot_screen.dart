@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({Key? key}) : super(key: key);
@@ -12,49 +13,62 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   final List<Map<String, String>> _messages = [
     {
       'sender': 'ai',
-      'text': 'হ্যালো! SeiRokom Fashion-এ স্বাগতম। সাইজ, দাম বা প্রোডাক্ট বিষয়ে কোনো প্রশ্ন থাকলে বলুন!'
+      'text': 'হ্যালো! SeiRokom Fashion AI অ্যাসিস্ট্যান্টে স্বাগতম। কীভাবে সাহায্য করতে পারি?'
     }
   ];
 
-  // ইউজার কী লিখছে তার ওপর ভিত্তি করে বুদ্ধিমান উত্তর তৈরি করার ফাংশন
-  String _getAIResponse(String query) {
-    String lowerQuery = query.toLowerCase();
+  bool _isLoading = false;
 
-    if (lowerQuery.contains('সাইজ') || lowerQuery.contains('size') || lowerQuery.contains('মাপ')) {
-      return 'আমাদের প্রিমিয়াম বাটিক শার্ট M, L, XL এবং XXL সাইজে অ্যাভেইলএবল রয়েছে। আপনার বুক ও লম্বা পরিমাপ অনুযায়ী সাইজ নির্বাচন করতে পারেন।';
-    } else if (lowerQuery.contains('দাম') || lowerQuery.contains('price') || lowerQuery.contains('টাকা') || lowerQuery.contains('কত')) {
-      return 'আমাদের প্রিমিয়াম বাটিক শার্টের দাম ৮৫০ টাকা থেকে শুরু। বিস্তারিত জানতে হোমপেজের প্রোডাক্টগুলো দেখুন।';
-    } else if (lowerQuery.contains('ডেলিভারি') || lowerQuery.contains('delivery') || lowerQuery.contains('চার্জ')) {
-      return 'ঢাকার ভেতরে ডেলিভারি চার্জ ৮০ টাকা এবং ঢাকার বাইরে ১৫০ টাকা। সাধারণত ২-৩ দিনের মধ্যে ডেলিভারি করা হয়।';
-    } else if (lowerQuery.contains('কাপড়') || lowerQuery.contains('মেটেরিয়াল') || lowerQuery.contains('fabric') || lowerQuery.contains('সুতি')) {
-      return 'আমাদের সব বাটিক শার্ট ১০০% প্রিমিয়াম কটন (সুতি) কাপড়ে তৈরি, যা অত্যন্ত আরামদায়ক।';
-    } else if (lowerQuery.contains('হাই') || lowerQuery.contains('হ্যালো') || lowerQuery.contains('hello') || lowerQuery.contains('hi')) {
-      return 'হ্যালো! আপনাকে কীভাবে সাহায্য করতে পারি?';
-    } else {
-      return 'ধন্যবাদ আপনার প্রশ্নের জন্য! প্রোডাক্টের সাইজ, দাম বা ডেলিভারি বিষয়ে বিস্তারিত জানতে আমাকে জিজ্ঞেস করতে পারেন।';
-    }
-  }
+  static const String _apiKey = 'YOUR_GEMINI_API_KEY_HERE';
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     if (_controller.text.trim().isEmpty) return;
 
     String userText = _controller.text;
     setState(() {
       _messages.add({'sender': 'user', 'text': userText});
       _controller.clear();
+      _isLoading = true;
     });
 
-    // ১ সেকেন্ড পর ডাইনামিক রিপ্লাই দেবে
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          _messages.add({
-            'sender': 'ai',
-            'text': _getAIResponse(userText)
-          });
-        });
+    try {
+      if (_apiKey == 'YOUR_GEMINI_API_KEY_HERE') {
+        await Future.delayed(const Duration(seconds: 1));
+        _addAiMessage(_getFallbackResponse(userText));
+      } else {
+        final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: _apiKey);
+        final prompt = 'You are a helpful AI sales assistant for "SeiRokom Fashion", a clothing brand specializing in Batik Shirts in Bangladesh. Answer in polite Bengali. Question: $userText';
+        final response = await model.generateContent([Content.text(prompt)]);
+
+        _addAiMessage(response.text ?? 'দুঃখিত, পুনরায় চেষ্টা করুন।');
       }
-    });
+    } catch (e) {
+      _addAiMessage('ধন্যবাদ আপনার প্রশ্নের জন্য! আমাদের বাটিক শার্টের সাইজ, দাম বা ডেলিভারি বিষয়ে জানতে পারেন।');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _addAiMessage(String text) {
+    if (mounted) {
+      setState(() {
+        _messages.add({'sender': 'ai', 'text': text});
+      });
+    }
+  }
+
+  String _getFallbackResponse(String query) {
+    String q = query.toLowerCase();
+    if (q.contains('সাইজ') || q.contains('size')) {
+      return 'আমাদের প্রিমিয়াম বাটিক শার্ট M, L, XL এবং XXL সাইজে অ্যাভেইলএবল রয়েছে।';
+    } else if (q.contains('দাম') || q.contains('price')) {
+      return 'আমাদের প্রিমিয়াম বাটিক শার্টের দাম ৮৫০ টাকা থেকে শুরু।';
+    } else if (q.contains('ডেলিভারি')) {
+      return 'ঢাকার ভেতরে ডেলিভারি চার্জ ৮০ টাকা এবং ঢাকার বাইরে ১৫০ টাকা।';
+    }
+    return 'SeiRokom Fashion-এ আপনাকে স্বাগতম! আরও তথ্যের জন্য আমাদের সাথে থাকুন।';
   }
 
   @override
@@ -87,6 +101,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               },
             ),
           ),
+          if (_isLoading) const LinearProgressIndicator(color: Colors.amber),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
