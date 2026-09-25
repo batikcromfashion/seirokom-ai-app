@@ -19,7 +19,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   bool _isLoading = false;
 
-  // আপনার API Key
+  // আপনার ব্যবহৃত Gemini API Key
   static const String _apiKey = 'AQ.Ab8RN6I1xzqXu4C5KNqIb_NrAtIao7PgU5yqKgk9cyQasupPdw';
 
   Future<void> _sendMessage() async {
@@ -33,19 +33,19 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     });
 
     try {
-      // Gemini Flash মডেল
       final model = GenerativeModel(
-        model: 'gemini-1.5-flash', 
+        model: 'gemini-1.5-flash',
         apiKey: _apiKey,
       );
-      
-      final prompt = 'You are a helpful AI sales assistant for "SeiRokom Fashion", a clothing brand specializing in Batik Shirts in Bangladesh. Answer in polite Bengali. Question: $userText';
-      
+
+      final prompt =
+          'You are a helpful AI sales assistant for "SeiRokom Fashion", a clothing brand specializing in Batik Shirts in Bangladesh. Answer in polite Bengali. Question: $userText';
+
       final response = await model.generateContent([Content.text(prompt)]);
 
-      _addAiMessage(response.text ?? 'AI থেকে কোনো টেক্সট আসেনি।');
+      _addAiMessage(response.text ?? 'দুঃখিত, কোনো উত্তর পাওয়া যায়নি।');
     } catch (e) {
-      // আসল সমস্যা দেখার জন্য সরাসরি এররটি স্ক্রিনে দেখানো হচ্ছে
+      // সমস্যা নির্দিষ্টভাবে চ্যাট স্ক্রিনে দেখাবে
       _addAiMessage('এরর ধরা পড়েছে:\n${e.toString()}');
     } finally {
       setState(() {
@@ -63,7 +63,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   }
 
   @override
-  Widget build(Widget context) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('AI Sales Assistant', style: TextStyle(color: Colors.black)),
