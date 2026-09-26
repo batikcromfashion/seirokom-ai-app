@@ -1,6 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({Key? key}) : super(key: key);
@@ -20,8 +19,13 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   bool _isLoading = false;
 
-  // আপনার আসল API Key
-  static const String _apiKey = 'AQ.Ab8RN6K3cJHwRncjG-YFyHfn-699zBPGuRxwVCAUQN0p58-3KA';
+  // আপনার আসল API Key (AI Studio থেকে নেওয়া, AQ. বা AIzaSy — যেটাই আসুক)
+  static const String _apiKey = 'AQ.Ab8RN6Lzk6TAfsytPYDhEFUSFQ0X6n6468M7OMIgdOxt-5YMxA';
+
+  late final GenerativeModel _model = GenerativeModel(
+    model: 'gemini-2.5-flash',
+    apiKey: _apiKey,
+  );
 
   Future<void> _sendMessage() async {
     if (_controller.text.trim().isEmpty) return;
@@ -34,36 +38,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     });
 
     try {
-      final url = Uri.parse(
-          'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$_apiKey');
-
       final prompt =
           'You are a helpful AI sales assistant for "SeiRokom Fashion", a clothing brand specializing in Batik Shirts in Bangladesh. Answer in polite Bengali. Question: $userText';
 
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'contents': [
-            {
-              'parts': [
-                {'text': prompt}
-              ]
-            }
-          ]
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final aiText = data['candidates']?[0]['content']?['parts']?[0]['text'];
-        _addAiMessage(aiText ?? 'দুঃখিত, কোনো উত্তর পাওয়া যায়নি।');
-      } else {
-        final errorData = jsonDecode(response.body);
-        _addAiMessage('API Error (${response.statusCode}):\n${errorData['error']?['message'] ?? response.body}');
-      }
+      final response = await _model.generateContent([Content.text(prompt)]);
+      final aiText = response.text;
+      _addAiMessage(aiText ?? 'দুঃখিত, কোনো উত্তর পাওয়া যায়নি।');
     } catch (e) {
-      _addAiMessage('Connection Error:\n${e.toString()}');
+      _addAiMessage('Error:\n${e.toString()}');
     } finally {
       setState(() {
         _isLoading = false;
