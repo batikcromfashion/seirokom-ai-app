@@ -1,5 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:http/http.dart' as http;
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({Key? key}) : super(key: key);
@@ -19,13 +20,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   bool _isLoading = false;
 
-  // আপনার আসল API Key (AI Studio থেকে নেওয়া, AQ. বা AIzaSy — যেটাই আসুক)
-  static const String _apiKey = 'AQ.Ab8RN6Jw-FfYKCEAsVzThJoTMQxNwYg63wN2dg9VLosGcDJtSA';
-
-  late final GenerativeModel _model = GenerativeModel(
-    model: 'gemini-2.5-flash',
-    apiKey: _apiKey,
-  );
+  // console.groq.com/keys থেকে নেওয়া আপনার আসল Groq API Key দিন (gsk_ দিয়ে শুরু হয়)
+  static const String _apiKey = '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';
 
   Future<void> _sendMessage() async {
     if (_controller.text.trim().isEmpty) return;
@@ -38,14 +34,36 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     });
 
     try {
-      final prompt =
-          'You are a helpful AI sales assistant for "SeiRokom Fashion", a clothing brand specializing in Batik Shirts in Bangladesh. Answer in polite Bengali. Question: $userText';
+      final url = Uri.parse('https://api.groq.com/openai/v1/chat/completions');
 
-      final response = await _model.generateContent([Content.text(prompt)]);
-      final aiText = response.text;
-      _addAiMessage(aiText ?? 'দুঃখিত, কোনো উত্তর পাওয়া যায়নি।');
+      final systemPrompt =
+          'You are a helpful AI sales assistant for "SeiRokom Fashion", a clothing brand specializing in Batik Shirts in Bangladesh. Always answer in polite Bengali.';
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_apiKey',
+        },
+        body: jsonEncode({
+          'model': 'openai/gpt-oss-120b',
+          'messages': [
+            {'role': 'system', 'content': systemPrompt},
+            {'role': 'user', 'content': userText},
+          ],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        final aiText = data['choices']?[0]['message']?['content'];
+        _addAiMessage(aiText ?? 'দুঃখিত, কোনো উত্তর পাওয়া যায়নি।');
+      } else {
+        final errorData = jsonDecode(utf8.decode(response.bodyBytes));
+        _addAiMessage('API Error (${response.statusCode}):\n${errorData['error']?['message'] ?? response.body}');
+      }
     } catch (e) {
-      _addAiMessage('Error:\n${e.toString()}');
+      _addAiMessage('Connection Error:\n${e.toString()}');
     } finally {
       setState(() {
         _isLoading = false;
