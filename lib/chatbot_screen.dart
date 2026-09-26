@@ -20,7 +20,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   bool _isLoading = false;
 
   // আপনার আসল API Key (AI Studio থেকে নেওয়া, AQ. বা AIzaSy — যেটাই আসুক)
-  static const String _apiKey = 'AQ.Ab8RN6Lzk6TAfsytPYDhEFUSFQ0X6n6468M7OMIgdOxt-5YMxA';
+  static const String _apiKey = 'AQ.Ab8RN6Jw-FfYKCEAsVzThJoTMQxNwYg63wN2dg9VLosGcDJtSA';
 
   late final GenerativeModel _model = GenerativeModel(
     model: 'gemini-2.5-flash',
