@@ -1,30 +1,21 @@
 import 'package:flutter/material.dart';
 import 'size_calculator_screen.dart';
 import 'order_tracking_screen.dart';
+import 'admin_add_product_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   final List<Map<String, String>> products = const [
     {
-      'title': 'প্রিমিয়াম ব্লু বাটিক শার্ট',
-      'price': '৳ ১২৫০',
+      'title': ' প্রিমিয়াম সিল্ক বাটিক শার্ট',
+      'price': '৳ ২৫০০',
       'image': 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80',
     },
     {
-      'title': 'এক্সক্লুসিভ রেড বাটিক শার্ট',
-      'price': '৳ ১৩৫০',
+      'title': 'এক্সক্লুসিভ কটন বাটিক শার্ট',
+      'price': '৳ ১৮০০',
       'image': 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500&q=80',
-    },
-    {
-      'title': 'ক্লাসিক ব্ল্যাক বাটিক শার্ট',
-      'price': '৳ ১১৫০',
-      'image': 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&q=80',
-    },
-    {
-      'title': 'রয়েল প্রিমিয়াম বাটিক',
-      'price': '৳ ১৪৫০',
-      'image': 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&q=80',
     },
   ];
 
@@ -35,6 +26,16 @@ class HomeScreen extends StatelessWidget {
         title: const Text('SeiRokom Fashion', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.amber,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.add_business),
+            tooltip: 'Add Product (Admin)',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AdminAddProductScreen()),
+              );
+            },
+          ),
           IconButton(icon: const Icon(Icons.shopping_bag_outlined), onPressed: () {}),
         ],
       ),
@@ -43,7 +44,6 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Welcome Banner
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -60,10 +60,7 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
             const SizedBox(height: 15),
-
-            // AI Feature Quick Action Buttons
             Row(
               children: [
                 Expanded(
@@ -75,12 +72,8 @@ class HomeScreen extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.straighten, size: 18),
-                    label: const Text('AI সাইজ ও কাস্টম', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
+                    label: const Text('Size Calc'),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.amber.shade200),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -93,67 +86,11 @@ class HomeScreen extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.local_shipping, size: 18),
-                    label: const Text('অর্ডার ট্র্যাক করুন', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
+                    label: const Text('Track Order'),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.amber.shade200),
                   ),
                 ),
               ],
-            ),
-
-            const SizedBox(height: 20),
-            const Text('আমাদের এক্সক্লুসিভ কালেকশন', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            
-            // Product Grid
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.72,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-              ),
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final product = products[index];
-                return Card(
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                          child: Image.network(
-                            product['image']!,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(color: Colors.grey.shade300, child: const Icon(Icons.image_not_supported)),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(product['title']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                            const SizedBox(height: 4),
-                            Text(product['price']!, style: const TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
             ),
           ],
         ),
