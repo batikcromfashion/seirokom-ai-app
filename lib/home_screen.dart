@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'size_calculator_screen.dart';
+import 'order_tracking_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -41,6 +43,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Welcome Banner
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -57,9 +60,55 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
+            
+            const SizedBox(height: 15),
+
+            // AI Feature Quick Action Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SizeCalculatorScreen()),
+                      );
+                    },
+                    icon: const Icon(Icons.straighten, size: 18),
+                    label: const Text('AI সাইজ ও কাস্টম', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.amber,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const OrderTrackingScreen()),
+                      );
+                    },
+                    icon: const Icon(Icons.local_shipping, size: 18),
+                    label: const Text('অর্ডার ট্র্যাক করুন', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
             const SizedBox(height: 20),
             const Text('আমাদের এক্সক্লুসিভ কালেকশন', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
+            
+            // Product Grid
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
