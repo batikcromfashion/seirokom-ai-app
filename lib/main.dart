@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'home_screen.dart';
 import 'tryon_screen.dart';
 import 'chatbot_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const SeiRokomApp());
 }
 
@@ -17,7 +20,7 @@ class SeiRokomApp extends StatelessWidget {
       title: 'SeiRokom Fashion',
       theme: ThemeData(
         primarySwatch: Colors.amber,
-        scaffoldBackgroundColor: const Color(0xFFF9F9F9),
+        scaffoldBackgroundColor: const Color(0xFFF5F0F0),
       ),
       home: const MainNavigationScreen(),
     );
@@ -34,10 +37,10 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const TryOnScreen(),
-    const ChatbotScreen(),
+  final List<Widget> _screens = const [
+    HomeScreen(),
+    TryOnScreen(),
+    ChatbotScreen(),
   ];
 
   @override
