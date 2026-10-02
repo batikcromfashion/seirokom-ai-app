@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({Key? key}) : super(key: key);
@@ -22,6 +23,16 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   // console.groq.com/keys থেকে নেওয়া আপনার আসল Groq API Key দিন (gsk_ দিয়ে শুরু হয়)
   static const String _apiKey = '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';
+
+  // ওয়েবসাইট লিংক খোলার ফাংশন
+  Future<void> _launchWebsite() async {
+    final Uri url = Uri.parse('https://seirokom.com'); // আপনার ওয়েবসাইট লিংক এখানে বসান
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('ওয়েবসাইট লিংকটি ওপেন করা সম্ভব হয়নি।')),
+      );
+    }
+  }
 
   Future<void> _sendMessage() async {
     if (_controller.text.trim().isEmpty) return;
@@ -86,6 +97,13 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         title: const Text('AI Sales Assistant', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.amber,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.language, color: Colors.black),
+            tooltip: 'ওয়েবসাইট ভিজিট করুন',
+            onPressed: _launchWebsite,
+          ),
+        ],
       ),
       body: Column(
         children: [
