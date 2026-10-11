@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'size_calculator_screen.dart';
 import 'order_tracking_screen.dart';
 import 'admin_add_product_screen.dart';
+import 'post_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -27,6 +28,16 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.amber,
         actions: [
           IconButton(
+            icon: const Icon(Icons.post_add),
+            tooltip: 'Facebook Post',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PostScreen()),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.add_business),
             tooltip: 'Add Product (Admin)',
             onPressed: () {
@@ -36,7 +47,6 @@ class HomeScreen extends StatelessWidget {
               );
             },
           ),
-          IconButton(icon: const Icon(Icons.shopping_bag_outlined), onPressed: () {}),
         ],
       ),
       body: SingleChildScrollView(
