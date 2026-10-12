@@ -7,19 +7,6 @@ import 'post_screen.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
-  final List<Map<String, String>> products = const [
-    {
-      'title': ' প্রিমিয়াম সিল্ক বাটিক শার্ট',
-      'price': '৳ ২৫০০',
-      'image': 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80',
-    },
-    {
-      'title': 'এক্সক্লুসিভ কটন বাটিক শার্ট',
-      'price': '৳ ১৮০০',
-      'image': 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500&q=80',
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
