@@ -20,7 +20,8 @@ class SeiRokomApp extends StatelessWidget {
       title: 'SeiRokom Fashion',
       theme: ThemeData(
         primarySwatch: Colors.amber,
-        scaffoldBackgroundColor: const Color(0xFFF5F0F0),
+        scaffoldBackgroundColor: const Color(0xFF0F172A), // FIX: সাদা থেকে ডার্ক করা হলো
+        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF0F172A)),
       ),
       home: const MainNavigationScreen(),
     );
@@ -48,14 +49,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF1E293B),
         currentIndex: _selectedIndex,
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
           });
         },
-        selectedItemColor: Colors.amber.shade900,
+        selectedItemColor: Colors.amber.shade700,
         unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
