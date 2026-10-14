@@ -6,7 +6,12 @@ import 'chatbot_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  // FIX: Firebase না থাকলেও App সাদা হবে না
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    print("Firebase Error, but App will run: $e");
+  }
   runApp(const SeiRokomApp());
 }
 
@@ -20,8 +25,7 @@ class SeiRokomApp extends StatelessWidget {
       title: 'SeiRokom Fashion',
       theme: ThemeData(
         primarySwatch: Colors.amber,
-        scaffoldBackgroundColor: const Color(0xFF0F172A), // FIX: সাদা থেকে ডার্ক করা হলো
-        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF0F172A)),
+        scaffoldBackgroundColor: const Color(0xFF0F172A), // ডার্ক, সাদা না
       ),
       home: const MainNavigationScreen(),
     );
@@ -38,7 +42,7 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = const [
+  final List<Widget> _screens = [
     HomeScreen(),
     TryOnScreen(),
     ChatbotScreen(),
@@ -47,34 +51,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF0F172A),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF1E293B),
         currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        selectedItemColor: Colors.amber.shade700,
+        onTap: (index) => setState(() => _selectedIndex = index),
+        selectedItemColor: Colors.amber,
         unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'হোম',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.auto_awesome_outlined),
-            activeIcon: Icon(Icons.auto_awesome),
-            label: 'AI ট্রাই-অন',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            activeIcon: Icon(Icons.chat_bubble),
-            label: 'AI চ্যাট',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'হোম'),
+          BottomNavigationBarItem(icon: Icon(Icons.checkroom), label: 'ট্রাই-অন'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'AI চ্যাট'),
         ],
       ),
     );
