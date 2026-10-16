@@ -1,0 +1,5 @@
+@override
+void dispose() {
+  _messageController.dispose();
+  super.dispose();
+}
