@@ -3,10 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'home_screen.dart';
 import 'tryon_screen.dart';
 import 'chatbot_screen.dart';
+import 'post_screen.dart'; // নতুন AI Post
+import 'admin_add_product_screen.dart'; // নতুন Admin
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // FIX: Firebase না থাকলেও App সাদা হবে না
   try {
     await Firebase.initializeApp();
   } catch (e) {
@@ -25,7 +26,7 @@ class SeiRokomApp extends StatelessWidget {
       title: 'SeiRokom Fashion',
       theme: ThemeData(
         primarySwatch: Colors.amber,
-        scaffoldBackgroundColor: const Color(0xFF0F172A), // ডার্ক, সাদা না
+        scaffoldBackgroundColor: const Color(0xFF0F172A), // ডার্ক, একদম ঠিক
       ),
       home: const MainNavigationScreen(),
     );
@@ -34,7 +35,6 @@ class SeiRokomApp extends StatelessWidget {
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({Key? key}) : super(key: key);
-
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
@@ -46,6 +46,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     HomeScreen(),
     TryOnScreen(),
     ChatbotScreen(),
+    PostScreen(), // ৪ নম্বরে তোমার Sohidul পেইজের Assistant
+    AdminAddProductScreen(), // ৫ নম্বরে Admin
   ];
 
   @override
@@ -59,10 +61,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         onTap: (index) => setState(() => _selectedIndex = index),
         selectedItemColor: Colors.amber,
         unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed, // ৫টা Tab এর জন্য জরুরি
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'হোম'),
           BottomNavigationBarItem(icon: Icon(Icons.checkroom), label: 'ট্রাই-অন'),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'AI চ্যাট'),
+          BottomNavigationBarItem(icon: Icon(Icons.post_add), label: 'AI পোস্ট'),
+          BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings), label: 'Admin'),
         ],
       ),
     );
